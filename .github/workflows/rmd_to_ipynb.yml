@@ -13,6 +13,18 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+        # Output is usable as command-line argument list in Linux shell
+          list-files: shell
+          # Enable listing of files matching each filter.
+          # Paths to files will be available in `${FILTER_NAME}_files` output variable.
+          # Paths will be escaped and space-delimited.
+          filters: |
+            rmarkdown:
+              - added|modified: '**.Rmd'
+        if: ${{ steps.filter.outputs.rmarkdown == 'true' }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -22,24 +34,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -U notebook
           python -m pip install -U jupytext
-      - name: Install a Jupyter Kernel
-        run: python -m ipykernel install --name python_kernel --user
-      #- name: Convert Rmarkdown to ipynb if in commit
-      - uses: dorny/paths-filter@v2
-        id: filter
-        with:
-        # Enable listing of files matching each filter.
-        # Paths to files will be available in `${FILTER_NAME}_files` output variable.
-        # Paths will be escaped and space-delimited.
-        # Output is usable as command-line argument list in Linux shell
-          list-files: shell
-          filters: |
-            rmarkdown:
-              - added|modified: '**.rmd'
+          python -m ipykernel install --name python_kernel --user
       - name: Convert Rmd to ipynb
-        if: ${{ steps.filter.outputs.rmarkdown == 'true' }}
         run: |
-          jupytext --to notebook ${{ steps.filter.outputs.rmarkdown_files }} --from Rmd
+          jupytext --from Rmd --to ipynb ${{ steps.filter.outputs.rmarkdown_files }}
           git add --all
           git commit -m "build notebook from Rmarkdown files"
           git push origin
