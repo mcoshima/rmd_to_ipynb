@@ -6,7 +6,7 @@ on:
     paths:
       - "**.rmd"
 
-name: RMD to ipynb workflow
+name: Rmarkdown to ipynb
 jobs:
   convert_rmd_to_ipynb:
     runs-on: ubuntu-latest
@@ -24,7 +24,7 @@ jobs:
           python -m pip install -U jupytext
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
-      - name: Check if RMarkdown file is in the commit
+      #- name: Convert Rmarkdown to ipynb if in commit
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -36,7 +36,7 @@ jobs:
           filters: |
             rmarkdown:
               - added|modified: '*.rmd'
-      - name: Convert Notebook
+      - name: Convert Rmd to ipynb
         if: ${{ steps.filter.outputs.rmarkdown == 'true' }}
         run: |
           jupytext --to ipynb ${{ steps.filter.outputs.rmarkdown_files }}
