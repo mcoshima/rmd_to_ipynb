@@ -42,6 +42,6 @@ jobs:
           for i in ${{ steps.filter.outputs.rmarkdown_files }}; do 
             jupytext --to ipynb $i
             git add ${i}.ipynb
-            git commit -m "build notebook from $i"
-            git push origin
           done
+          git commit -m "build notebook"
+          git push origin
