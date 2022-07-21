@@ -32,11 +32,12 @@ jobs:
       - name: List all changed files
         run: |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed"
+            ext=${changed_file: -3}
+            echo "$ext"
           done
       #- run: |
        #   for changed_file in ${{ steps.files.outputs.all }}; do
-       #   ext=${changed_file: -3}
+       #   
        #   if [ "$ext" = "rmd" ]; then
        #       echo "$changed_file is an rmd file"
        #     #jupytext --to notebook $changed_file
