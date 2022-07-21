@@ -25,18 +25,35 @@ jobs:
           pip install -U notebook
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
+        
+      - uses: r-lib/actions/setup-r@master
+
+      - uses: r-lib/actions/setup-pandoc@master
+
+      - name: Install dependencies
+        run: |
+          install.packages("rmarkdown")
+          devtools::install_github("mkearney/rmd2jupyter")
+        shell: Rscript {0}
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v23.2
 
-      - name: List all changed files
-        run: |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            ext=${changed_file: -3}
-            if [ "$ext" = "rmd" ]; then
-             echo "$changed_file is an rmd file"
-           fi
-          done
+      - name: get rmd file
+        run: Rscript -e 'rmd_file <- $changed_file[grep(".rmd", $changed_file)]'
+        
+      - name: Convert to notebook
+        run: Rscript -e 'rmd2jupyter::rmd2jupyter(rmd_file)
+        
+
+      #- name: List all changed files
+       # run: |
+        #  for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+         #   ext=${changed_file: -3}
+          #  if [ "$ext" = "rmd" ]; then
+           #  echo "$changed_file is an rmd file"
+           #fi
+         # done
       #- run: |
        #   for changed_file in ${{ steps.files.outputs.all }}; do
        #   
