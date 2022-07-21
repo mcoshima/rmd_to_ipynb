@@ -25,16 +25,23 @@ jobs:
           pip install -U notebook
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
-      - name: Convert rmd files to notebook and commit
-        uses: jitterbit/get-changed-files@v1
-      - run: |
-          for changed_file in ${{ steps.files.outputs.all }}; do
-          ext=${changed_file: -3}
-          if [ "$ext" = "rmd" ]; then
-              echo "$changed_file is an rmd file"
-            #jupytext --to notebook $changed_file
-          fi
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v23.2
+
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            echo "$file was changed"
           done
+      #- run: |
+       #   for changed_file in ${{ steps.files.outputs.all }}; do
+       #   ext=${changed_file: -3}
+       #   if [ "$ext" = "rmd" ]; then
+       #       echo "$changed_file is an rmd file"
+       #     #jupytext --to notebook $changed_file
+       #   fi
+       #   done
       - name: Add & Commit
         uses: EndBug/add-and-commit@v9.0.1
         with:
