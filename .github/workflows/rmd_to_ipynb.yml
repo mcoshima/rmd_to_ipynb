@@ -3,6 +3,8 @@
 # Controls when the action will run. Workflow runs changes are pushed to any branch
 on:
   push:
+    paths:
+      - "**.rmd"
 
 name: RMD to ipynb workflow
 jobs:
@@ -30,10 +32,14 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
+      - uses: r-lib/actions/setup-r@v1
+      - name: Query dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), ".github/depends.Rds", version = 2)
       - name: Install dependencies
         run: |
-          install.packages("devtools")
-          devtools::install_github("mkearney/rmd2jupyter")
+          remotes::install_github("mkearney/rmd2jupyter")
         shell: Rscript {0}
       - name: Get changed files
         id: changed-files
