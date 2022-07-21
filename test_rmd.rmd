@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is a test R markdown. to notebook
+This is a test R markdown. Now .Rmd
 
 ```{r cars}
 plot(x = cars$speed, y = cars$dist, pch = 16)
