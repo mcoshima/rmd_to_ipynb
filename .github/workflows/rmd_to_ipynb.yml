@@ -3,8 +3,6 @@
 # Controls when the action will run. Workflow runs changes are pushed to any branch
 on:
   push:
-    paths:
-      - "**.Rmd"
 
 name: Rmarkdown to ipynb
 jobs:
