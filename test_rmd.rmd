@@ -18,9 +18,6 @@ plot(x = cars$speed, y = cars$dist, pch = 16)
 cars$speed
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
