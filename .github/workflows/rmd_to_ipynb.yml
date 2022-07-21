@@ -11,11 +11,8 @@ jobs:
   convert_rmd_to_ipynb:
     runs-on: ubuntu-latest
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repo
-        uses: actions/checkout@v3
-        with: 
-          fetch-depth: 2
+        uses: actions/checkout@v2
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -23,48 +20,28 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Notebook
-          pip install -U notebook
+          python -m pip install -U notebook
+          python -m pip install -U jupytext
       - name: Install a Jupyter Kernel
         run: python -m ipykernel install --name python_kernel --user
-        
-      - uses: r-lib/actions/setup-r@master
-
-      - uses: r-lib/actions/setup-pandoc@master
-      - name: Install dependencies
+      - name: Check if RMarkdown file is in the commit
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+        # Enable listing of files matching each filter.
+        # Paths to files will be available in `${FILTER_NAME}_files` output variable.
+        # Paths will be escaped and space-delimited.
+        # Output is usable as command-line argument list in Linux shell
+          list-files: shell
+          filters: |
+            rmarkdown:
+              - added|modified: '*.rmd'
+      - name: Convert Notebook
+        if: ${{ steps.filter.outputs.rmarkdown == 'true' }}
         run: |
-          install.packages('remotes')
-          remotes::install_github("mkearney/rmd2jupyter")          
-        shell: Rscript {0}
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v23.2
-
-      - name: get rmd file
-        run: Rscript -e 'rmd_file <- $changed_file[grep(".rmd", $changed_file)]'
-        
-      - name: Convert to notebook
-        run: Rscript -e 'rmd2jupyter::rmd2jupyter(rmd_file)
-        
-
-      #- name: List all changed files
-       # run: |
-        #  for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-         #   ext=${changed_file: -3}
-          #  if [ "$ext" = "rmd" ]; then
-           #  echo "$changed_file is an rmd file"
-           #fi
-         # done
-      #- run: |
-       #   for changed_file in ${{ steps.files.outputs.all }}; do
-       #   
-       #   
-       #     #jupytext --to notebook $changed_file
-       #   fi
-       #   done
-     # - name: Add & Commit
-      #  uses: EndBug/add-and-commit@v9.0.1
-       # with:
-        #  message: "Convert RMD to Notebook"
-         # add: $changed_file
-      
+          for i in ${{ steps.filter.outputs.rmarkdown_files }}; do 
+            jupytext --to ipynb $i
+            git add ${i}.ipynb
+            git commit -m "build notebook from $i"
+            git push origin
+          done
