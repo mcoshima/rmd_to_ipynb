@@ -39,7 +39,7 @@ jobs:
       - name: Convert Rmd to ipynb
         if: ${{ steps.filter.outputs.rmarkdown == 'true' }}
         run: |
-          jupytext --to ipynb ${{ steps.filter.outputs.rmarkdown_files }}
+          jupytext --to notebook ${{ steps.filter.outputs.rmarkdown_files }}
           git add --all
           git commit -m "build notebook from Rmarkdown files"
           git push origin
