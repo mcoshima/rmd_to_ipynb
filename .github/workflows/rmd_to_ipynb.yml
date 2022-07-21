@@ -35,7 +35,7 @@ jobs:
           list-files: shell
           filters: |
             rmarkdown:
-              - added|modified: '*.Rmd'
+              - added|modified: '**.Rmd'
       - name: Convert Rmd to ipynb
         if: ${{ steps.filter.outputs.rmarkdown == 'true' }}
         run: |
